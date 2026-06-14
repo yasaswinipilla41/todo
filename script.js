@@ -4,6 +4,23 @@ const todoList = document.getElementById('todo-list');
 
 let todos = [];
 
+const STORAGE_KEY = 'todos_v1';
+
+function loadTodos() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try {
+      todos = JSON.parse(stored);
+    } catch (e) {
+      todos = [];
+    }
+  }
+}
+
+function saveTodos() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
 function renderTodos() {
   todoList.innerHTML = '';
 
@@ -57,12 +74,15 @@ function addTodo() {
     text,
   });
 
+  saveTodos();
+
   todoInput.value = '';
   renderTodos();
 }
 
 function deleteTodo(id) {
   todos = todos.filter((item) => item.id !== id);
+  saveTodos();
   renderTodos();
 }
 
@@ -77,6 +97,7 @@ function toggleEditMode(id, label, editInput, editButton) {
     editButton.textContent = 'Edit';
     label.style.display = 'inline';
     editInput.style.display = 'none';
+    saveTodos();
   } else {
     editButton.textContent = 'Save';
     label.style.display = 'none';
@@ -90,4 +111,5 @@ todoInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') addTodo();
 });
 
+loadTodos();
 renderTodos();
